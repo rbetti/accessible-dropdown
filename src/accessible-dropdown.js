@@ -1,39 +1,38 @@
-import { getInstanceSettings, keyboard } from './accessible-dropdown.defaults';
+import { getSettings, keyboard } from './accessible-dropdown.defaults';
 import UTILS from './utils';
 
 let uuid = 0,
-  mouseTimeoutID = null,
-	focusTimeoutID = null;
+    //mouseTimeoutID = null,
+    focusTimeoutID = null;
 
-const AccessibleDropdown = function(element, opts) {
-  let self = this;
-  self.settings = getInstanceSettings(opts);
-
-  if (typeof element === 'string') {
-    self.element = document.querySelector(element);
-  } else {
-    if (typeof element.length !== 'undefined' && element.length > 0) {
-      self.element = element[0];
-    } else {
-      self.element = element;
+class AccessibleDropdown {
+  constructor(element, opts) {
+    let self = this;
+    self.settings = getSettings(opts);
+    if (typeof element === 'string') {
+      self.element = document.querySelector(element);
     }
+    else {
+      if (typeof element.length !== 'undefined' && element.length > 0) {
+        self.element = element[0];
+      }
+      else {
+        self.element = element;
+      }
+    }
+    self.init();
   }
-
-  self.init();
 }
 
 AccessibleDropdown.prototype = {
   init: function() {
     var self = this;
     self.menu = self.element.querySelectorAll('ul')[0]; // selects the first UL item inside the nav element
-
-    self.element.setAttribute('role', 'navigation'); // check
+    
+    // Add ARIA role attribute if main element is not a NAV
+    if (self.element.tagName !== 'NAV') self.element.setAttribute('role', 'navigation');
+    
     self.focusable = self.menu.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-
-    // Add data attribute to all focusable elements with nested level
-    Array.from(self.focusable).forEach( item => {
-      item.setAttribute('data-level', UTILS.getParents( item, 'li' ).length);
-    });
 
     let navItemsWithChildren = self.menu.querySelectorAll(`.${self.settings.hasChildrenClass}`);
     navItemsWithChildren && Array.from(navItemsWithChildren).forEach( item => {
@@ -51,7 +50,7 @@ AccessibleDropdown.prototype = {
       });
 
       UTILS.setAttributes(subnav, {
-				'aria-expanded': false,
+				//'aria-expanded': false,
 				'aria-hidden': true,
 				'aria-labelledby': link.id
 			});
@@ -82,22 +81,19 @@ AccessibleDropdown.prototype = {
 
   onFocusin: function(e) {
     let self = this;
-    clearTimeout(focusTimeoutID);
+    clearTimeout( focusTimeoutID )
     let target = e.target,
-				parent = target.closest('li'),
-				topNavItem = target.closest('.' + self.settings.navName + self.settings.topNavItemClass);
+				parent = target.closest('li')
 
-    parent.classList.add( self.settings.focusClass );
-    //if(topNavItem) topNavItem.classList.add( self.settings.hoverClass );
-    self.toggleSubnav(target);
+    parent.classList.add( self.settings.focusClass )
+    self.toggleSubnav( target )
   },
 
   onFocusout: function(e) {
     let self = this;
     let target = e.target,
-				parent = target.closest('li');
-
-    parent.classList.remove( self.settings.focusClass );
+        parent = target.closest('li')
+    parent.classList.remove( self.settings.focusClass )
   },
 
   onKeydown: function(e) {
@@ -107,47 +103,47 @@ AccessibleDropdown.prototype = {
 				isTopNavItem = parent.classList.contains( self.settings.navName + self.settings.topNavItemClass ),
 				topNavItem = target.closest('.' + self.settings.navName + self.settings.topNavItemClass),
         tabbables = Array.from(self.focusable).filter( item => {
-          return getComputedStyle(item).visibility === 'visible';
+          return getComputedStyle(item).visibility === 'visible'
         } ),
-        keycode = e.keyCode || e.which;
-
-    //console.log(tabbables)
-    //console.log(target);
+        keycode = e.keyCode || e.which,
+        i = 0
 
     switch (keycode) {
       case keyboard.DOWN:
-    		e.preventDefault();
-
-    		if( parent.classList.contains(self.settings.hasChildrenClass) && isTopNavItem  ) {
-    			self.toggleSubnav(e.target);
+        e.preventDefault();
+        var _target;
+        if( parent.classList.contains(self.settings.hasChildrenClass) && isTopNavItem  ) {
+          self.toggleSubnav(e.target);
           let subnav = parent.querySelector(`.${self.settings.navName}${self.settings.subNavItemClass}`);
           subnav.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0].focus();
-    		}
+        }
         else if (parent.nextElementSibling) {
-          var _target = parent.nextElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
+          _target = parent.nextElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
           _target.focus();
           self.toggleSubnav(_target);
         }
         else if( topNavItem.nextElementSibling ) {
-          for (var i = 0; i < tabbables.length; i++) {
+          for (i = 0; i < tabbables.length; i++) {
             if (tabbables[i] == target) {
-              var _target = tabbables[i + 1];
+              _target = tabbables[i + 1];
               break;
             }
           }
           _target.focus();
           self.toggleSubnav(_target);
-    		}
-    		break;
+        }
+        break;
 
       case keyboard.UP:
         e.preventDefault();
-        for(var i = 0; i < tabbables.length; i++) {
+
+        for(i = 0; i < tabbables.length; i++) {
           if(tabbables[i] == target) {
             var previous = tabbables[i - 1];
             break;
           }
         }
+        if(!previous) return false;
         previous.focus();
         self.toggleSubnav(previous);
         break;
@@ -157,12 +153,12 @@ AccessibleDropdown.prototype = {
 
         if (isTopNavItem) {
           if (!parent.nextElementSibling) return false
-          var _target = parent.nextElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
+            _target = parent.nextElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
         }
         else {
-          for (var i = 0; i < tabbables.length; i++) {
+          for (i = 0; i < tabbables.length; i++) {
             if (tabbables[i] == target) {
-              var _target = tabbables[i + 1];
+              _target = tabbables[i + 1];
               break;
             }
           }
@@ -176,12 +172,12 @@ AccessibleDropdown.prototype = {
 
         if (isTopNavItem) {
           if (!parent.previousElementSibling) return false
-          var _target = parent.previousElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
+          _target = parent.previousElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
         }
         else {
-          for (var i = 0; i < tabbables.length; i++) {
+          for (i = 0; i < tabbables.length; i++) {
             if (tabbables[i] == target) {
-              var _target = tabbables[i - 1];
+              _target = tabbables[i - 1];
               break;
             }
           }
@@ -194,32 +190,34 @@ AccessibleDropdown.prototype = {
 
   toggleSubnav: function(target) {
     const self = this;
-    let parent = target.closest('li'),
-			  subnav = parent.querySelector(':scope > .' + self.settings.navName + self.settings.subNavItemClass ),
-        hasPopup = parent.querySelector('[aria-haspopup]'),
-        siblings = Array.prototype.filter.call(parent.parentNode.children, child => child !== parent)
+    let parent = target.closest("li"),
+      hasPopup = parent.querySelector("[aria-haspopup]"),
+      subnav = parent.querySelector(`:scope > .${self.settings.navName + self.settings.subNavItemClass}` ),
+      siblings = Array.prototype.filter.call( parent.parentNode.children, (child) => child !== parent )
+    
+    hasPopup && hasPopup.setAttribute("aria-expanded", "true");
+    
+    if (subnav) {
+      subnav && subnav.classList.add(self.settings.openClass)
+      subnav && subnav.setAttribute("aria-hidden", "false")
+      let _subnav = subnav.querySelector(`.${self.settings.navName + self.settings.subNavItemClass}`)
+      _subnav && _subnav.classList.remove(self.settings.openClass)
+      _subnav && _subnav.setAttribute("aria-hidden", "true");
+    }
 
     // close siblings subnavs
     siblings && Array.from(siblings).forEach( sibling => {
-      sibling.classList.remove( self.settings.focusClass )
-      let subnav = sibling.querySelector(':scope > .' + self.settings.navName + self.settings.subNavItemClass)
-      subnav && subnav.classList.remove( self.settings.openClass )
-    });
-
-    // close direct subnav subnavs
-    if(subnav) {
-      let _subnav = subnav.querySelector( `.${self.settings.navName + self.settings.subNavItemClass}` )
-      _subnav && _subnav.classList.remove(self.settings.openClass)
-    }
-    
-    hasPopup && hasPopup.setAttribute('aria-expanded', 'true');
-
-    subnav && UTILS.setAttributes(subnav, {
-      'aria-expanded': 'true',
-      'aria-hidden': 'false'
-    })
-
-    subnav && subnav.classList.add( self.settings.openClass );
+      sibling.classList.remove(self.settings.focusClass)
+      let subItems = sibling.querySelectorAll("[aria-expanded]")
+      subItems && Array.from(subItems).forEach( item => {
+        item.setAttribute("aria-expanded", "false")
+        let _subnav = document.getElementById(
+          item.getAttribute("aria-controls")
+        )
+        _subnav.classList.remove(self.settings.openClass)
+        _subnav.setAttribute("aria-hidden", "true");
+      })
+    })    
   },
 
   addUniqueId: function(element) {
@@ -228,10 +226,7 @@ AccessibleDropdown.prototype = {
 	}
 }
 
-let accessibleNav = new AccessibleDropdown('#navbar', {
-  selector: '#navbar',
-});
-
+window.AccessibleDropdown = AccessibleDropdown
 
 // Array.from polyfill
 // Production steps of ECMA-262, Edition 6, 22.1.2.1
@@ -338,3 +333,24 @@ if (!Array.from) {
     });
   }
 })(window.document, Element.prototype);
+
+/*
+ * closest polyfill
+ * https://developer.mozilla.org/it/docs/Web/API/Element/closest
+ */
+if (!Element.prototype.matches) {
+  Element.prototype.matches = Element.prototype.msMatchesSelector ||
+    Element.prototype.webkitMatchesSelector;
+}
+
+if (!Element.prototype.closest) {
+  Element.prototype.closest = function (s) {
+    var el = this;
+
+    do {
+      if (el.matches(s)) return el;
+      el = el.parentElement || el.parentNode;
+    } while (el !== null && el.nodeType === 1);
+    return null;
+  };
+}

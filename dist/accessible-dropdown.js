@@ -4,7 +4,14 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.keyboard = exports.getInstanceSettings = void 0;
+exports.keyboard = exports.getSettings = void 0;
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 // Default settings
 var defaultSettings = {
   navName: "nav-main",
@@ -23,11 +30,11 @@ var defaultSettings = {
 
 };
 
-var getInstanceSettings = function getInstanceSettings(customSettings) {
-  return Object.assign({}, defaultSettings, customSettings);
+var getSettings = function getSettings(customSettings) {
+  return _objectSpread({}, defaultSettings, {}, customSettings);
 };
 
-exports.getInstanceSettings = getInstanceSettings;
+exports.getSettings = getSettings;
 var keyboard = {
   BACKSPACE: 8,
   COMMA: 188,
@@ -57,13 +64,17 @@ var _utils = _interopRequireDefault(require("./utils"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var uuid = 0,
-    mouseTimeoutID = null,
-    focusTimeoutID = null;
+    //mouseTimeoutID = null,
+focusTimeoutID = null;
 
 var AccessibleDropdown = function AccessibleDropdown(element, opts) {
+  _classCallCheck(this, AccessibleDropdown);
+
   var self = this;
-  self.settings = (0, _accessibleDropdown.getInstanceSettings)(opts);
+  self.settings = (0, _accessibleDropdown.getSettings)(opts);
 
   if (typeof element === 'string') {
     self.element = document.querySelector(element);
@@ -82,14 +93,10 @@ AccessibleDropdown.prototype = {
   init: function init() {
     var self = this;
     self.menu = self.element.querySelectorAll('ul')[0]; // selects the first UL item inside the nav element
+    // Add ARIA role attribute if main element is not a NAV
 
-    self.element.setAttribute('role', 'navigation'); // check
-
-    self.focusable = self.menu.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); // Add data attribute to all focusable elements with nested level
-
-    Array.from(self.focusable).forEach(function (item) {
-      item.setAttribute('data-level', _utils["default"].getParents(item, 'li').length);
-    });
+    if (self.element.tagName !== 'NAV') self.element.setAttribute('role', 'navigation');
+    self.focusable = self.menu.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
     var navItemsWithChildren = self.menu.querySelectorAll(".".concat(self.settings.hasChildrenClass));
     navItemsWithChildren && Array.from(navItemsWithChildren).forEach(function (item) {
       var link = item.querySelector(':scope > a'),
@@ -105,7 +112,7 @@ AccessibleDropdown.prototype = {
       });
 
       _utils["default"].setAttributes(subnav, {
-        'aria-expanded': false,
+        //'aria-expanded': false,
         'aria-hidden': true,
         'aria-labelledby': link.id
       });
@@ -134,10 +141,8 @@ AccessibleDropdown.prototype = {
     var self = this;
     clearTimeout(focusTimeoutID);
     var target = e.target,
-        parent = target.closest('li'),
-        topNavItem = target.closest('.' + self.settings.navName + self.settings.topNavItemClass);
-    parent.classList.add(self.settings.focusClass); //if(topNavItem) topNavItem.classList.add( self.settings.hoverClass );
-
+        parent = target.closest('li');
+    parent.classList.add(self.settings.focusClass);
     self.toggleSubnav(target);
   },
   onFocusout: function onFocusout(e) {
@@ -155,27 +160,29 @@ AccessibleDropdown.prototype = {
         tabbables = Array.from(self.focusable).filter(function (item) {
       return getComputedStyle(item).visibility === 'visible';
     }),
-        keycode = e.keyCode || e.which; //console.log(tabbables)
-    //console.log(target);
+        keycode = e.keyCode || e.which,
+        i = 0;
 
     switch (keycode) {
       case _accessibleDropdown.keyboard.DOWN:
         e.preventDefault();
+
+        var _target;
 
         if (parent.classList.contains(self.settings.hasChildrenClass) && isTopNavItem) {
           self.toggleSubnav(e.target);
           var subnav = parent.querySelector(".".concat(self.settings.navName).concat(self.settings.subNavItemClass));
           subnav.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0].focus();
         } else if (parent.nextElementSibling) {
-          var _target = parent.nextElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
+          _target = parent.nextElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
 
           _target.focus();
 
           self.toggleSubnav(_target);
         } else if (topNavItem.nextElementSibling) {
-          for (var i = 0; i < tabbables.length; i++) {
+          for (i = 0; i < tabbables.length; i++) {
             if (tabbables[i] == target) {
-              var _target = tabbables[i + 1];
+              _target = tabbables[i + 1];
               break;
             }
           }
@@ -190,13 +197,14 @@ AccessibleDropdown.prototype = {
       case _accessibleDropdown.keyboard.UP:
         e.preventDefault();
 
-        for (var i = 0; i < tabbables.length; i++) {
+        for (i = 0; i < tabbables.length; i++) {
           if (tabbables[i] == target) {
             var previous = tabbables[i - 1];
             break;
           }
         }
 
+        if (!previous) return false;
         previous.focus();
         self.toggleSubnav(previous);
         break;
@@ -206,11 +214,11 @@ AccessibleDropdown.prototype = {
 
         if (isTopNavItem) {
           if (!parent.nextElementSibling) return false;
-          var _target = parent.nextElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
+          _target = parent.nextElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
         } else {
-          for (var i = 0; i < tabbables.length; i++) {
+          for (i = 0; i < tabbables.length; i++) {
             if (tabbables[i] == target) {
-              var _target = tabbables[i + 1];
+              _target = tabbables[i + 1];
               break;
             }
           }
@@ -226,11 +234,11 @@ AccessibleDropdown.prototype = {
 
         if (isTopNavItem) {
           if (!parent.previousElementSibling) return false;
-          var _target = parent.previousElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
+          _target = parent.previousElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
         } else {
-          for (var i = 0; i < tabbables.length; i++) {
+          for (i = 0; i < tabbables.length; i++) {
             if (tabbables[i] == target) {
-              var _target = tabbables[i - 1];
+              _target = tabbables[i - 1];
               break;
             }
           }
@@ -244,39 +252,44 @@ AccessibleDropdown.prototype = {
   },
   toggleSubnav: function toggleSubnav(target) {
     var self = this;
-    var parent = target.closest('li'),
-        subnav = parent.querySelector(':scope > .' + self.settings.navName + self.settings.subNavItemClass),
-        hasPopup = parent.querySelector('[aria-haspopup]'),
+    var parent = target.closest("li"),
+        hasPopup = parent.querySelector("[aria-haspopup]"),
+        subnav = parent.querySelector(":scope > .".concat(self.settings.navName + self.settings.subNavItemClass)),
         siblings = Array.prototype.filter.call(parent.parentNode.children, function (child) {
       return child !== parent;
-    }); // close siblings subnavs
-
-    siblings && Array.from(siblings).forEach(function (sibling) {
-      sibling.classList.remove(self.settings.focusClass);
-      var subnav = sibling.querySelector(':scope > .' + self.settings.navName + self.settings.subNavItemClass);
-      subnav && subnav.classList.remove(self.settings.openClass);
-    }); // close direct subnav subnavs
+    });
+    hasPopup && hasPopup.setAttribute("aria-expanded", "true");
 
     if (subnav) {
+      subnav && subnav.classList.add(self.settings.openClass);
+      subnav && subnav.setAttribute("aria-hidden", "false");
+
       var _subnav = subnav.querySelector(".".concat(self.settings.navName + self.settings.subNavItemClass));
 
       _subnav && _subnav.classList.remove(self.settings.openClass);
-    }
+      _subnav && _subnav.setAttribute("aria-hidden", "true");
+    } // close siblings subnavs
 
-    hasPopup && hasPopup.setAttribute('aria-expanded', 'true');
-    subnav && _utils["default"].setAttributes(subnav, {
-      'aria-expanded': 'true',
-      'aria-hidden': 'false'
+
+    siblings && Array.from(siblings).forEach(function (sibling) {
+      sibling.classList.remove(self.settings.focusClass);
+      var subItems = sibling.querySelectorAll("[aria-expanded]");
+      subItems && Array.from(subItems).forEach(function (item) {
+        item.setAttribute("aria-expanded", "false");
+
+        var _subnav = document.getElementById(item.getAttribute("aria-controls"));
+
+        _subnav.classList.remove(self.settings.openClass);
+
+        _subnav.setAttribute("aria-hidden", "true");
+      });
     });
-    subnav && subnav.classList.add(self.settings.openClass);
   },
   addUniqueId: function addUniqueId(element) {
     if (!element.id) element.id = this.settings.uuidPrefix + "-" + new Date().getTime() + "-" + ++uuid;
   }
 };
-var accessibleNav = new AccessibleDropdown('#navbar', {
-  selector: '#navbar'
-}); // Array.from polyfill
+window.AccessibleDropdown = AccessibleDropdown; // Array.from polyfill
 // Production steps of ECMA-262, Edition 6, 22.1.2.1
 
 if (!Array.from) {
@@ -405,6 +418,28 @@ if (!Array.from) {
     });
   }
 })(window.document, Element.prototype);
+/*
+ * closest polyfill
+ * https://developer.mozilla.org/it/docs/Web/API/Element/closest
+ */
+
+
+if (!Element.prototype.matches) {
+  Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+}
+
+if (!Element.prototype.closest) {
+  Element.prototype.closest = function (s) {
+    var el = this;
+
+    do {
+      if (el.matches(s)) return el;
+      el = el.parentElement || el.parentNode;
+    } while (el !== null && el.nodeType === 1);
+
+    return null;
+  };
+}
 
 },{"./accessible-dropdown.defaults":1,"./utils":3}],3:[function(require,module,exports){
 "use strict";
@@ -426,9 +461,7 @@ var UTILS = {
     if (!Element.prototype.matches) {
       Element.prototype.matches = Element.prototype.matchesSelector || Element.prototype.mozMatchesSelector || Element.prototype.msMatchesSelector || Element.prototype.oMatchesSelector || Element.prototype.webkitMatchesSelector || function (s) {
         var matches = (this.document || this.ownerDocument).querySelectorAll(s),
-            i = matches.length;
-
-        while (--i >= 0 && matches.item(i) !== this) {}
+            i = matches.length; //while (--i >= 0 && matches.item(i) !== this) {}
 
         return i > -1;
       };

@@ -10,8 +10,8 @@ const defaultSettings = {
   openClass: 'open', // default css class for the open state
 };
 
-export const getInstanceSettings = customSettings => {
-  return Object.assign({}, defaultSettings, customSettings);
+export const getSettings = customSettings => {
+  return { ...defaultSettings, ...customSettings }
 };
 
 export const keyboard = {

@@ -16,11 +16,11 @@
 		<div class="container">
 			<ul class="nav-main__items">
 				<li class="nav-main__li-level1 hasChildren level1_1">
-					<a href="https://www.example.com"><span>Top link 1</span></a>
+					<a href="https://toplink1.com"><span>Top link 1</span></a>
 
 					<ul class="nav-main__sublevel nav-main__level-2">
 						<li class="nav-main__li-level2 hasChildren level2_1">
-							<a href="https://www.example.com"><span>Lorem ipsum</span></a>
+							<a href="https://Loremipsum.com"><span>Lorem ipsum</span></a>
 
 							<ul class="nav-main__sublevel nav-main__level-3">
 								<li class="nav-main__li-level3">
@@ -84,4 +84,10 @@
 
 	<!-- javascript -->
 	<script src="../dist/accessible-dropdown.js"></script>
+	<script type="text/javascript">
+		var navbar = new AccessibleDropdown('#navbar', {
+			selector: '#navbar',
+			uuidPrefix: 'ugo'
+		});
+	</script>
 </body>

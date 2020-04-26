@@ -1,0 +1,121 @@
+*, *:before, *:after {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Raleway', sans-serif;
+  color: #3a3a3a;
+}
+
+.element-invisible {
+  position: absolute !important;
+  clip: rect(1px 1px 1px 1px);
+  /* IE6, IE7 */
+  clip: rect(1px, 1px, 1px, 1px);
+  overflow: hidden;
+  height: 1px;
+}
+
+.element-focusable:focus {
+  position: static !important;
+  height: auto;
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 0.875rem;
+  padding: 10px 0;
+  color: #3a3a3a;
+}
+
+.navbar {
+  background: #b81800;
+}
+
+.nav-main__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.nav-main__items :focus {
+  outline: 2px solid rgba(255, 95, 215, 0.3);
+}
+
+.nav-main__items .hasChildren {
+  position: relative;
+}
+
+.nav-main__items .hasChildren:hover > .nav-main__sublevel, .nav-main__items .hasChildren.focus > .nav-main__sublevel {
+  left: 0;
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-main__items > li {
+  margin: 0 20px;
+}
+
+.nav-main__items > li > a {
+  display: block;
+  color: #fff;
+  font-size: 0.875rem;
+  padding: 1em 8px;
+  cursor: pointer;
+  -webkit-transition: all 0.1s;
+  transition: all 0.1s;
+  font-size: 20px;
+}
+
+.nav-main__items .nav-main__sublevel {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: absolute;
+  top: 100%;
+  left: -9999px;
+  visibility: hidden;
+  opacity: 0;
+  width: 100%;
+  min-width: 240px;
+  z-index: 999;
+}
+
+.nav-main__items .nav-main__sublevel.open {
+  left: 0;
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-main__items .nav-main__sublevel a {
+  color: #575757;
+  font-size: 1rem;
+  display: block;
+  padding: 10px 1em;
+  margin-bottom: 1px;
+  background: #f9f9f9;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+.nav-main__items .nav-main__sublevel.nav-main__level-3 {
+  top: 0;
+  margin-left: 1px;
+}
+
+.nav-main__items .nav-main__sublevel.nav-main__level-3.open {
+  left: 100%;
+}
+
+.nav-main__items .nav-main__li-level2:hover .nav-main__sublevel {
+  left: 100%;
+}
+/*# sourceMappingURL=screen.css.map */
