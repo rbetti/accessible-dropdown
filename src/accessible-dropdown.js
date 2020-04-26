@@ -50,7 +50,6 @@ AccessibleDropdown.prototype = {
       });
 
       UTILS.setAttributes(subnav, {
-				//'aria-expanded': false,
 				'aria-hidden': true,
 				'aria-labelledby': link.id
 			});
