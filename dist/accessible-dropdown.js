@@ -112,7 +112,6 @@ AccessibleDropdown.prototype = {
       });
 
       _utils["default"].setAttributes(subnav, {
-        //'aria-expanded': false,
         'aria-hidden': true,
         'aria-labelledby': link.id
       });
@@ -143,13 +142,16 @@ AccessibleDropdown.prototype = {
     var target = e.target,
         parent = target.closest('li');
     parent.classList.add(self.settings.focusClass);
-    self.toggleSubnav(target);
+    self.toggleSubnav(e, target);
   },
   onFocusout: function onFocusout(e) {
     var self = this;
     var target = e.target,
         parent = target.closest('li');
     parent.classList.remove(self.settings.focusClass);
+    focusTimeoutID = setTimeout(function () {
+      self.toggleSubnav(e, target, true);
+    }, 250);
   },
   onKeydown: function onKeydown(e) {
     var self = this,
@@ -170,7 +172,7 @@ AccessibleDropdown.prototype = {
         var _target;
 
         if (parent.classList.contains(self.settings.hasChildrenClass) && isTopNavItem) {
-          self.toggleSubnav(e.target);
+          self.toggleSubnav(e, e.target);
           var subnav = parent.querySelector(".".concat(self.settings.navName).concat(self.settings.subNavItemClass));
           subnav.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0].focus();
         } else if (parent.nextElementSibling) {
@@ -178,7 +180,7 @@ AccessibleDropdown.prototype = {
 
           _target.focus();
 
-          self.toggleSubnav(_target);
+          self.toggleSubnav(e, _target);
         } else if (topNavItem.nextElementSibling) {
           for (i = 0; i < tabbables.length; i++) {
             if (tabbables[i] == target) {
@@ -189,7 +191,7 @@ AccessibleDropdown.prototype = {
 
           _target.focus();
 
-          self.toggleSubnav(_target);
+          self.toggleSubnav(e, _target);
         }
 
         break;
@@ -206,7 +208,7 @@ AccessibleDropdown.prototype = {
 
         if (!previous) return false;
         previous.focus();
-        self.toggleSubnav(previous);
+        self.toggleSubnav(e, previous);
         break;
 
       case _accessibleDropdown.keyboard.RIGHT:
@@ -226,7 +228,7 @@ AccessibleDropdown.prototype = {
 
         _target.focus();
 
-        self.toggleSubnav(_target);
+        self.toggleSubnav(e, _target);
         break;
 
       case _accessibleDropdown.keyboard.LEFT:
@@ -246,18 +248,32 @@ AccessibleDropdown.prototype = {
 
         _target.focus();
 
-        self.toggleSubnav(_target);
+        self.toggleSubnav(e, _target);
         break;
     }
   },
-  toggleSubnav: function toggleSubnav(target) {
+  toggleSubnav: function toggleSubnav(event, target, hide) {
     var self = this;
     var parent = target.closest("li"),
         hasPopup = parent.querySelector("[aria-haspopup]"),
         subnav = parent.querySelector(":scope > .".concat(self.settings.navName + self.settings.subNavItemClass)),
         siblings = Array.prototype.filter.call(parent.parentNode.children, function (child) {
       return child !== parent;
-    });
+    }); // Hide all panels.
+
+    if (hide) {
+      var activeItems = self.menu.querySelectorAll("[aria-expanded=true]");
+      activeItems && Array.from(activeItems).forEach(function (item) {
+        item.setAttribute("aria-expanded", "false");
+
+        var _subnav = document.getElementById(item.getAttribute("aria-controls"));
+
+        _subnav.classList.remove(self.settings.openClass);
+
+        _subnav.setAttribute("aria-hidden", "true");
+      });
+    }
+
     hasPopup && hasPopup.setAttribute("aria-expanded", "true");
 
     if (subnav) {

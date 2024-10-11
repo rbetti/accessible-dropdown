@@ -40,21 +40,21 @@ body {
   padding: 0;
   display: flex;
   justify-content: center; }
-  /* line 42, src/sass/screen.scss */
+  /* line 43, src/sass/screen.scss */
   .nav-main__items :focus {
     outline: 2px solid rgba(255, 95, 215, 0.3); }
-  /* line 46, src/sass/screen.scss */
+  /* line 47, src/sass/screen.scss */
   .nav-main__items .hasChildren {
     position: relative; }
-    /* line 50, src/sass/screen.scss */
+    /* line 51, src/sass/screen.scss */
     .nav-main__items .hasChildren:hover > .nav-main__sublevel, .nav-main__items .hasChildren.focus > .nav-main__sublevel {
       left: 0;
       opacity: 1;
       visibility: visible; }
-  /* line 58, src/sass/screen.scss */
+  /* line 59, src/sass/screen.scss */
   .nav-main__items > li {
     margin: 0 20px; }
-    /* line 61, src/sass/screen.scss */
+    /* line 62, src/sass/screen.scss */
     .nav-main__items > li > a {
       display: block;
       color: #fff;
@@ -63,7 +63,7 @@ body {
       cursor: pointer;
       transition: all 0.1s;
       font-size: 20px; }
-  /* line 72, src/sass/screen.scss */
+  /* line 73, src/sass/screen.scss */
   .nav-main__items .nav-main__sublevel {
     margin: 0;
     padding: 0;
@@ -76,12 +76,12 @@ body {
     width: 100%;
     min-width: 240px;
     z-index: 999; }
-    /* line 85, src/sass/screen.scss */
+    /* line 86, src/sass/screen.scss */
     .nav-main__items .nav-main__sublevel.open {
       left: 0;
       opacity: 1;
       visibility: visible; }
-    /* line 91, src/sass/screen.scss */
+    /* line 92, src/sass/screen.scss */
     .nav-main__items .nav-main__sublevel a {
       color: #575757;
       font-size: 1rem;
@@ -90,14 +90,18 @@ body {
       margin-bottom: 1px;
       background: #f9f9f9;
       transition: all 0.2s; }
-    /* line 101, src/sass/screen.scss */
+      /* line 101, src/sass/screen.scss */
+      .nav-main__items .nav-main__sublevel a:focus {
+        background-color: green;
+        color: #fff; }
+    /* line 107, src/sass/screen.scss */
     .nav-main__items .nav-main__sublevel.nav-main__level-3 {
       top: 0;
       margin-left: 1px; }
-      /* line 105, src/sass/screen.scss */
+      /* line 111, src/sass/screen.scss */
       .nav-main__items .nav-main__sublevel.nav-main__level-3.open {
         left: 100%; }
-  /* line 113, src/sass/screen.scss */
+  /* line 119, src/sass/screen.scss */
   .nav-main__items .nav-main__li-level2:hover .nav-main__sublevel {
     left: 100%; }
 

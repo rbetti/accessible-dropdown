@@ -35,7 +35,7 @@
 					</ul>
 				</li>
 				<li class="nav-main__li-level1 hasChildren">
-					<a href="https://www.example.com"><span>Example link 2</span></a>
+					<a href="https://www.example.com"><span>Top link 2</span></a>
 
 					<ul class="nav-main__sublevel nav-main__level-2">
 						<li class="nav-main__li-level2">
@@ -67,27 +67,47 @@
 				</li>
 
 				<li class="nav-main__li-level1">
-					<a href="https://www.example.com"><span>consectetur adipiscing elit</span></a>
+					<a href="https://www.example.com"><span>Top link 3</span></a>
 				</li>
 
 				<li class="nav-main__li-level1 hasChildren">
-					<a href="http://www.example.com/"><span>ku</span></a>
+					<a href="http://www.example.com/"><span>Top link 4</span></a>
+					
 					<ul class="nav-main__sublevel nav-main__level-2">
-						<li class="nav-main__li-level2">
-							<a href="http://www.example.com/"><span>wrotri</span></a>
+						<li class="nav-main__li-level2 hasChildren">
+							<a href="http://www.example.com/"><span>This is a link</span></a>
+							
+							<ul class="nav-main__sublevel nav-main__level-3">
+								<li class="nav-main__li-level3">
+									<a href="https://www.example.com"><span>Link 3° livello</span></a>
+								</li>
+							</ul>
 						</li>
 					</ul>
+				</li>
+
+
+				<li class="nav-main__li-level1">
+					<a href="https://www.example.com"><span>Top link 4</span></a>
 				</li>
 			</ul>
 		</div>
 	</nav>
+
+	<min role="main">
+		<a id="main-content"></a>
+
+		<div class="container">
+			<p>Lorem Ipsum dolor sit amet. <a href="http://www.example.com">Link</a></p>
+		</div>
+	</min>
 
 	<!-- javascript -->
 	<script src="../dist/accessible-dropdown.js"></script>
 	<script type="text/javascript">
 		var navbar = new AccessibleDropdown('#navbar', {
 			selector: '#navbar',
-			uuidPrefix: 'ugo'
+			uuidPrefix: 'accessible-menu'
 		});
 	</script>
 </body>
