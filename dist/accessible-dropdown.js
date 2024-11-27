@@ -20,7 +20,7 @@ var defaultSettings = {
   hasChildrenClass: 'hasChildren',
   topNavItemClass: '__li-level1',
   // default css class for a top-level navigation item in the menu
-  subNavItemClass: '__sublevel',
+  subNavItemClass: '.subnav',
   // default css class for a submenu
   hoverClass: 'hover',
   // default css class for the hover state
@@ -100,7 +100,7 @@ AccessibleDropdown.prototype = {
     var navItemsWithChildren = self.menu.querySelectorAll(".".concat(self.settings.hasChildrenClass));
     navItemsWithChildren && Array.from(navItemsWithChildren).forEach(function (item) {
       var link = item.querySelector(':scope > a'),
-          subnav = item.querySelector(':scope > ul');
+          subnav = item.querySelector(self.settings.subNavItemClass);
       self.addUniqueId(link);
       self.addUniqueId(subnav);
 
@@ -172,8 +172,9 @@ AccessibleDropdown.prototype = {
         var _target;
 
         if (parent.classList.contains(self.settings.hasChildrenClass) && isTopNavItem) {
-          self.toggleSubnav(e, e.target);
-          var subnav = parent.querySelector(".".concat(self.settings.navName).concat(self.settings.subNavItemClass));
+          self.toggleSubnav(e, e.target); //let subnav = parent.querySelector(`.${self.settings.navName}${self.settings.subNavItemClass}`);
+
+          var subnav = parent.querySelector(self.settings.subNavItemClass);
           subnav.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0].focus();
         } else if (parent.nextElementSibling) {
           _target = parent.nextElementSibling.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0];
@@ -256,7 +257,7 @@ AccessibleDropdown.prototype = {
     var self = this;
     var parent = target.closest("li"),
         hasPopup = parent.querySelector("[aria-haspopup]"),
-        subnav = parent.querySelector(":scope > .".concat(self.settings.navName + self.settings.subNavItemClass)),
+        subnav = parent.querySelector(":scope > ".concat(self.settings.subNavItemClass)),
         siblings = Array.prototype.filter.call(parent.parentNode.children, function (child) {
       return child !== parent;
     }); // Hide all panels.

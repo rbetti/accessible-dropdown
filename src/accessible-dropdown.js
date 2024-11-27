@@ -38,7 +38,7 @@ AccessibleDropdown.prototype = {
 
     navItemsWithChildren && Array.from(navItemsWithChildren).forEach( item => {
       let link = item.querySelector(':scope > a'),
-          subnav = item.querySelector(':scope > ul');
+          subnav = item.querySelector(self.settings.subNavItemClass);
 
       self.addUniqueId(link);
       self.addUniqueId(subnav);
@@ -117,7 +117,8 @@ AccessibleDropdown.prototype = {
         var _target;
         if( parent.classList.contains(self.settings.hasChildrenClass) && isTopNavItem  ) {
           self.toggleSubnav(e, e.target);
-          let subnav = parent.querySelector(`.${self.settings.navName}${self.settings.subNavItemClass}`);
+          //let subnav = parent.querySelector(`.${self.settings.navName}${self.settings.subNavItemClass}`);
+          let subnav = parent.querySelector(self.settings.subNavItemClass)
           subnav.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')[0].focus();
         }
         else if (parent.nextElementSibling) {
@@ -196,7 +197,7 @@ AccessibleDropdown.prototype = {
     
     let parent = target.closest("li"),
       hasPopup = parent.querySelector("[aria-haspopup]"),
-      subnav = parent.querySelector(`:scope > .${self.settings.navName + self.settings.subNavItemClass}` ),
+      subnav = parent.querySelector(`:scope > ${self.settings.subNavItemClass}` ),
       siblings = Array.prototype.filter.call( parent.parentNode.children, (child) => child !== parent )
     
     // Hide all panels.

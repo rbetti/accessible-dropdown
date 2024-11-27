@@ -4,7 +4,7 @@ const defaultSettings = {
   uuidPrefix: 'accessible-dropdown', // default uuidPrefix to be added
   hasChildrenClass: 'hasChildren',
   topNavItemClass: '__li-level1', // default css class for a top-level navigation item in the menu
-  subNavItemClass: '__sublevel', // default css class for a submenu
+  subNavItemClass: '.subnav', // default css class for a submenu
   hoverClass: 'hover', // default css class for the hover state
   focusClass: 'focus', // default css class for the focus state
   openClass: 'open', // default css class for the open state
