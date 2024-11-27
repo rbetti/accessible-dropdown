@@ -272,34 +272,34 @@ AccessibleDropdown.prototype = {
 
         _subnav.setAttribute("aria-hidden", "true");
       });
+    } else {
+      hasPopup && hasPopup.setAttribute("aria-expanded", "true");
+
+      if (subnav) {
+        subnav && subnav.classList.add(self.settings.openClass);
+        subnav && subnav.setAttribute("aria-hidden", "false");
+
+        var _subnav = subnav.querySelector(".".concat(self.settings.navName + self.settings.subNavItemClass));
+
+        _subnav && _subnav.classList.remove(self.settings.openClass);
+        _subnav && _subnav.setAttribute("aria-hidden", "true");
+      } // close siblings subnavs
+
+
+      siblings && Array.from(siblings).forEach(function (sibling) {
+        sibling.classList.remove(self.settings.focusClass);
+        var subItems = sibling.querySelectorAll("[aria-expanded]");
+        subItems && Array.from(subItems).forEach(function (item) {
+          item.setAttribute("aria-expanded", "false");
+
+          var _subnav = document.getElementById(item.getAttribute("aria-controls"));
+
+          _subnav.classList.remove(self.settings.openClass);
+
+          _subnav.setAttribute("aria-hidden", "true");
+        });
+      }); //this.toggleExpandedEventHandlers()
     }
-
-    hasPopup && hasPopup.setAttribute("aria-expanded", "true");
-
-    if (subnav) {
-      subnav && subnav.classList.add(self.settings.openClass);
-      subnav && subnav.setAttribute("aria-hidden", "false");
-
-      var _subnav = subnav.querySelector(".".concat(self.settings.navName + self.settings.subNavItemClass));
-
-      _subnav && _subnav.classList.remove(self.settings.openClass);
-      _subnav && _subnav.setAttribute("aria-hidden", "true");
-    } // close siblings subnavs
-
-
-    siblings && Array.from(siblings).forEach(function (sibling) {
-      sibling.classList.remove(self.settings.focusClass);
-      var subItems = sibling.querySelectorAll("[aria-expanded]");
-      subItems && Array.from(subItems).forEach(function (item) {
-        item.setAttribute("aria-expanded", "false");
-
-        var _subnav = document.getElementById(item.getAttribute("aria-controls"));
-
-        _subnav.classList.remove(self.settings.openClass);
-
-        _subnav.setAttribute("aria-hidden", "true");
-      });
-    });
   },
   addUniqueId: function addUniqueId(element) {
     if (!element.id) element.id = this.settings.uuidPrefix + "-" + new Date().getTime() + "-" + ++uuid;

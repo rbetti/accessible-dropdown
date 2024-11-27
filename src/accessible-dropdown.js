@@ -35,6 +35,7 @@ AccessibleDropdown.prototype = {
     self.focusable = self.menu.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
 
     let navItemsWithChildren = self.menu.querySelectorAll(`.${self.settings.hasChildrenClass}`);
+
     navItemsWithChildren && Array.from(navItemsWithChildren).forEach( item => {
       let link = item.querySelector(':scope > a'),
           subnav = item.querySelector(':scope > ul');
@@ -192,6 +193,7 @@ AccessibleDropdown.prototype = {
 
   toggleSubnav: function(event, target, hide) {
     const self = this;
+    
     let parent = target.closest("li"),
       hasPopup = parent.querySelector("[aria-haspopup]"),
       subnav = parent.querySelector(`:scope > .${self.settings.navName + self.settings.subNavItemClass}` ),
@@ -210,29 +212,33 @@ AccessibleDropdown.prototype = {
       })
     }
 
-    hasPopup && hasPopup.setAttribute("aria-expanded", "true");
+    else {
+      hasPopup && hasPopup.setAttribute("aria-expanded", "true");
     
-    if (subnav) {
-      subnav && subnav.classList.add(self.settings.openClass)
-      subnav && subnav.setAttribute("aria-hidden", "false")
-      let _subnav = subnav.querySelector(`.${self.settings.navName + self.settings.subNavItemClass}`)
-      _subnav && _subnav.classList.remove(self.settings.openClass)
-      _subnav && _subnav.setAttribute("aria-hidden", "true");
-    }
+      if (subnav) {
+        subnav && subnav.classList.add(self.settings.openClass)
+        subnav && subnav.setAttribute("aria-hidden", "false")
+        let _subnav = subnav.querySelector(`.${self.settings.navName + self.settings.subNavItemClass}`)
+        _subnav && _subnav.classList.remove(self.settings.openClass)
+        _subnav && _subnav.setAttribute("aria-hidden", "true");
+      }
 
-    // close siblings subnavs
-    siblings && Array.from(siblings).forEach( sibling => {
-      sibling.classList.remove(self.settings.focusClass)
-      let subItems = sibling.querySelectorAll("[aria-expanded]")
-      subItems && Array.from(subItems).forEach( item => {
-        item.setAttribute("aria-expanded", "false")
-        let _subnav = document.getElementById(
-          item.getAttribute("aria-controls")
-        )
-        _subnav.classList.remove(self.settings.openClass)
-        _subnav.setAttribute("aria-hidden", "true");
+      // close siblings subnavs
+      siblings && Array.from(siblings).forEach( sibling => {
+        sibling.classList.remove(self.settings.focusClass)
+        let subItems = sibling.querySelectorAll("[aria-expanded]")
+        subItems && Array.from(subItems).forEach( item => {
+          item.setAttribute("aria-expanded", "false")
+          let _subnav = document.getElementById(
+            item.getAttribute("aria-controls")
+          )
+          _subnav.classList.remove(self.settings.openClass)
+          _subnav.setAttribute("aria-hidden", "true");
+        })
       })
-    })    
+
+      //this.toggleExpandedEventHandlers()
+    }
   },
 
   addUniqueId: function(element) {
